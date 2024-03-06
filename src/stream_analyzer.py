@@ -30,7 +30,7 @@ class Stream_Analyzer:
         visualize = True,
         verbose   = False,
         height    = 450,
-        window_ratio = 24/9):
+        window_ratio = 16/9):
 
         self.n_frequency_bins = n_frequency_bins
         self.rate = rate
