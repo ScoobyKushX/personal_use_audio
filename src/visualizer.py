@@ -89,26 +89,40 @@ class Spectrum_Visualizer:
         self.bin_font = pygame.font.Font('freesansbold.ttf', round(0.025*self.HEIGHT))
         self.fps_font = pygame.font.Font('freesansbold.ttf', round(0.05*self.HEIGHT))
 
+        # Initialize text tags and rectangles for frequency bins
+        self.init_bin_tags()
+
+        self._is_running = True
+
+        # Initialize interactive components
+        self.init_interactive_components()
+
+    def init_bin_tags(self):
         for i in range(self.ear.n_frequency_bins):
             if i == 0 or i == (self.ear.n_frequency_bins - 1):
                 continue
             if i % self.tag_every_n_bins == 0:
                 f_centre = self.ear.frequency_bin_centres[i]
-                text = self.bin_font.render('%d Hz' %f_centre, True, (255, 255, 255) , (self.bg_color, self.bg_color, self.bg_color))
+                text = self.bin_font.render('%d Hz' % f_centre, True, (255, 255, 255),
+                                            (self.bg_color, self.bg_color, self.bg_color))
                 textRect = text.get_rect()
-                x = i*(self.WIDTH / self.ear.n_frequency_bins) + (self.bar_width - textRect.x)/2
-                y = 0.98*self.HEIGHT
-                textRect.center = (int(x),int(y))
+                x = i * (self.WIDTH / self.ear.n_frequency_bins) + (self.bar_width - textRect.x) / 2
+                y = 0.98 * self.HEIGHT
+                textRect.center = (int(x), int(y))
                 self.bin_text_tags.append(text)
                 self.bin_rectangles.append(textRect)
 
-        self._is_running = True
+    def init_interactive_components(self):
+        self.button_height = round(0.05 * self.HEIGHT)
+        self.history_button = Button(text="Toggle 2D/3D Mode", right=self.WIDTH, top=0, width=round(0.12 * self.WIDTH),
+                                     height=self.button_height)
+        self.slow_bar_button = Button(text="Toggle Slow Bars", right=self.WIDTH, top=self.history_button.height,
+                                      width=round(0.12 * self.WIDTH), height=self.button_height)
 
-        #Interactive components:
-        self.button_height = round(0.05*self.HEIGHT)
-        self.history_button  = Button(text="Toggle 2D/3D Mode", right=self.WIDTH, top=0, width=round(0.12*self.WIDTH), height=self.button_height)
-        self.slow_bar_button = Button(text="Toggle Slow Bars", right=self.WIDTH, top=self.history_button.height, width=round(0.12*self.WIDTH), height=self.button_height)
-
+        self.quit_button = Button(text="Quit", right=self.WIDTH,
+                                  top=self.history_button.height + self.slow_bar_button.height,
+                                  width=round(0.12 * self.WIDTH), height=self.button_height)
+        self.quit_button.buttonHOVER.fill((255, 0, 0))
     def stop(self):
         print("Stopping spectrum visualizer...")
         del self.fps_font
@@ -127,12 +141,16 @@ class Spectrum_Visualizer:
 
     def update(self):
         for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.stop()
             if self.history_button.click():
                 self.plot_audio_history = not self.plot_audio_history
                 self.toggle_history_mode()
             if self.slow_bar_button.click():
                 self.add_slow_bars = not self.add_slow_bars
-                self.slow_features = [0]*self.ear.n_frequency_bins
+                self.slow_features = [0] * self.ear.n_frequency_bins
+            if self.quit_button.click():
+                self.stop()
 
         if np.min(self.ear.bin_mean_values) > 0:
             self.frequency_bin_energies = self.avg_energy_height * self.ear.frequency_bin_energies / self.ear.bin_mean_values
@@ -179,6 +197,9 @@ class Spectrum_Visualizer:
 
         self.history_button.draw(self.screen)
         self.slow_bar_button.draw(self.screen)
+        self.history_button.draw(self.screen)
+        self.slow_bar_button.draw(self.screen)
+        self.quit_button.draw(self.screen)
 
         pygame.display.flip()
 
