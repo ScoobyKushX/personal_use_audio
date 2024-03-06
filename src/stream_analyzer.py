@@ -24,7 +24,7 @@ class Stream_Analyzer:
         device = None,
         rate   = None,
         FFT_window_size_ms  = 50,
-        updates_per_second  = 100,
+        updates_per_second  = 250,
         smoothing_length_ms = 50,
         n_frequency_bins    = 51,
         visualize = True,
