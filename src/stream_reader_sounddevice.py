@@ -30,6 +30,7 @@ class Stream_Reader:
 
         try:
             sd.check_input_settings(device=device, channels=1, dtype=np.float32, extra_settings=None, samplerate=rate)
+            sd.check_output_settings(device=device, channels=1, dtype=np.float32, extra_settings=None, samplerate=rate)
         except:
             print("Input sound settings for device %s and samplerate %s Hz not supported, using defaults..." %(str(device), str(rate)))
             rate = None
@@ -49,7 +50,7 @@ class Stream_Reader:
         # This part is a bit hacky, need better solution for this:
         # Determine what the optimal buffer shape is by streaming some test audio
         self.optimal_data_lengths = []
-        with sd.InputStream(samplerate=self.rate,
+        with sd.OutputStream(samplerate=self.rate,
                             blocksize=0,
                             device=self.device,
                             channels=1,
@@ -63,16 +64,16 @@ class Stream_Reader:
 
         #Alternative:
         #self.update_window_n_frames = round_up_to_even(44100 / updates_per_second)
-
-        self.stream = sd.InputStream(
-                                    samplerate=self.rate,
-                                    blocksize=self.update_window_n_frames,
-                                    device=None,
-                                    channels=1,
-                                    dtype=np.float32,
-                                    latency='low',
-                                    extra_settings=None,
-                                    callback=self.non_blocking_stream_read)
+        for i, device in enumerate(device_dict):
+            self.stream = sd.OutputStream(
+                                        samplerate=48000,
+                                        blocksize=self.update_window_n_frames,
+                                        device=self.device,
+                                        channels=2,
+                                        dtype=np.float32,
+                                        latency='low',
+                                        extra_settings=None,
+                                        callback=self.non_blocking_stream_read)
 
         self.rate = self.stream.samplerate
         self.device = self.stream.device
@@ -89,7 +90,7 @@ class Stream_Reader:
 
         print("\n##################################################################################################")
         print("\nDefaulted to using first working mic, Running on mic %s with properties:" %str(self.device))
-        print(device_dict[self.device])
+        print(device_dict[1])
         print('Which has a latency of %.2f ms' %(1000*self.device_latency))
         print("\n##################################################################################################")
         print('Recording audio at %d Hz\nUsing (non-overlapping) data-windows of %d samples (updating at %.2ffps)'

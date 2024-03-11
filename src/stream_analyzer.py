@@ -2,7 +2,7 @@ import numpy as np
 import time, math, scipy
 from collections import deque
 from scipy.signal import savgol_filter
-
+import sounddevice as sd
 from src.fft import getFFT
 from src.utils import *
 
@@ -21,7 +21,7 @@ class Stream_Analyzer:
     """
 
     def __init__(self,
-        device = None,
+        device = 24,
         rate   = None,
         FFT_window_size_ms  = 50,
         updates_per_second  = 100,
@@ -31,7 +31,8 @@ class Stream_Analyzer:
         verbose   = False,
         height    = 450,
         window_ratio = 24/9):
-
+        device_dict = sd.query_devices(),
+        print(device_dict)
         self.n_frequency_bins = n_frequency_bins
         self.rate = rate
         self.verbose = verbose
