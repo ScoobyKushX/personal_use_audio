@@ -2,6 +2,9 @@ import numpy as np
 import time, sys, math
 import pygame
 from collections import deque
+
+from formUI import Ui_Form
+
 from src.utils import Button
 from matplotlib import cm
 
@@ -9,7 +12,9 @@ class Spectrum_Visualizer:
     """
     The Spectrum_Visualizer visualizes spectral FFT data using a simple PyGame GUI
     """
-    def __init__(self, ear):
+    def __init__(self, ear, parent=Ui_Form):
+        self.ui = Ui_Form()
+        self.ui.setupUi(Ui_Form)
         self.plot_audio_history = True
         self.ear = ear
 

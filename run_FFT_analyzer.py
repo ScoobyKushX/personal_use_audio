@@ -1,7 +1,27 @@
 import argparse
+
+import src.visualizer
 from src.stream_analyzer import Stream_Analyzer
 import time
+import PySide6
+from PySide6.QtWidgets import *
+from PySide6.QtCore import *
+from PySide6.QtGui import *
+from formUI import Ui_Form
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__(super().__init__(self, parent=Ui_Form), parent=Ui_Form.Ui_Form.opengl3dvisual)
+        self.ui = Ui_Form()
+        self.ui = self
+        self.ui.setupUi(self)
 
+        self.central_widget = QWidget()
+        self.setCentralWidget(self.central_widget)
+        self.central_layout = QVBoxLayout()
+        self.central_widget.setLayout(self.central_layout)
+
+        self.visualizer = src.visualizer.Spectrum_Visualizer()
+        self.central_layout.addWidget(self.visualizer)
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--device', type=int, default=None, dest='device',
